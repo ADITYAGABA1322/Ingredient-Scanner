@@ -1,3 +1,9 @@
+////
+////  ContentView.swift
+////  SwiftUI-Scanner
+////
+////  Created by Amit Gulati on 02/05/24.
+////
 //
 //import SwiftUI
 //import VisionKit
@@ -5,13 +11,14 @@
 //struct ContentView: View {
 //    
 //    @EnvironmentObject var vm: AppViewModel
-//    
+//    @State var isAlertVisible = false
+//
 //    private let textContentTypes: [(title: String, textContentType: DataScannerViewController.TextContentType?)] = [
-//        ("All", .none),
-//        ("URL", .URL),
-//        ("Phone", .telephoneNumber),
-//        ("Email", .emailAddress),
-//        ("Address", .fullStreetAddress)
+////        ("All", .none),
+////        ("URL", .URL),
+////        ("Phone", .telephoneNumber),
+////        ("Email", .emailAddress),
+////        ("Address", .fullStreetAddress)
 //    ]
 //    
 //    var body: some View {
@@ -32,6 +39,7 @@
 //    private var mainView: some View {
 //        DataScannerView(
 //            recognizedItems: $vm.recognizedItems,
+//            showAlert: $isAlertVisible,
 //            recognizedDataType: vm.recognizedDataType,
 //            recognizesMultipleItems: vm.recognizesMultipleItems)
 //        .background { Color.gray.opacity(0.3) }
@@ -54,6 +62,25 @@
 //        .onChange(of: vm.scanType) { _ in vm.recognizedItems = [] }
 //        .onChange(of: vm.textContentType) { _ in vm.recognizedItems = [] }
 //        .onChange(of: vm.recognizesMultipleItems) { _ in vm.recognizedItems = []}
+//        .alert(
+//                    "Scan Results",
+//                    isPresented: $isAlertVisible
+//                    
+//                ) {
+//                    Button(role: .destructive) {
+//                        // Handle the deletion.
+//                    } label: {
+//                        Text("Delete")
+//                    }
+//                    Button("Retry") {
+//                        // Handle the retry action.
+//                    }
+//                } message: {
+//                    Text("RESULTS")
+//                }
+////        .alert(isPresented: $vm.showAlert) {
+////            Alert(title: Text("Scanned Text"), message: Text("The scanner has scanned some text."), dismissButton: .default(Text("OK")))
+////        }
 //    }
 //    
 //    private var headerView: some View {
@@ -64,7 +91,7 @@
 //                    Text("Text").tag(ScanType.text)
 //                }.pickerStyle(.segmented)
 //                
-//                Toggle("Scan multiple", isOn: $vm.recognizesMultipleItems)
+//              //  Toggle("Scan multiple", isOn: $vm.recognizesMultipleItems)
 //            }.padding(.top)
 //            
 //            if vm.scanType == .text {
@@ -102,7 +129,18 @@
 //        }
 //    }
 //}
+//
+//#Preview {
+//    ContentView()
+//}
 
+
+//
+//  ContentView.swift
+//  SwiftUI-Scanner
+//
+//  Created by Amit Gulati on 02/05/24.
+//
 
 import SwiftUI
 import VisionKit
@@ -110,6 +148,7 @@ import VisionKit
 struct ContentView: View {
     
     @EnvironmentObject var vm: AppViewModel
+    @State var isAlertVisible = false
 
     private let textContentTypes: [(title: String, textContentType: DataScannerViewController.TextContentType?)] = [
 //        ("All", .none),
@@ -134,35 +173,88 @@ struct ContentView: View {
         }
     }
     
+//    private var mainView: some View {
+//        DataScannerView(
+//            recognizedItems: $vm.recognizedItems,
+//            showAlert: $isAlertVisible,
+//            recognizedDataType: vm.recognizedDataType,
+//            recognizesMultipleItems: vm.recognizesMultipleItems)
+//        .background { Color.gray.opacity(0.3) }
+//        .ignoresSafeArea()
+//        .id(vm.dataScannerViewId)
+//        .sheet(isPresented: .constant(true)) {
+//            bottomContainerView
+//                .background(.ultraThinMaterial)
+//                .presentationDetents([.medium, .fraction(0.25)])
+//                .presentationDragIndicator(.visible)
+//                .interactiveDismissDisabled()
+//                .onAppear {
+//                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+//                          let controller = windowScene.windows.first?.rootViewController?.presentedViewController else {
+//                        return
+//                    }
+//                    controller.view.backgroundColor = .clear
+//                }
+//        }
+//        .onChange(of: vm.scanType) { _ in vm.recognizedItems = [] }
+//        .onChange(of: vm.textContentType) { _ in vm.recognizedItems = [] }
+//        .onChange(of: vm.recognizesMultipleItems) { _ in vm.recognizedItems = []}
+//        .alert(
+//                    "Scan Results",
+//                    isPresented: $isAlertVisible
+//                    
+//                ) {
+//                    Button(role: .destructive) {
+//                        // Handle the deletion.
+//                    } label: {
+//                        Text("Delete")
+//                    }
+//                    Button("Retry") {
+//                        // Handle the retry action.
+//                    }
+//                } message: {
+//                    Text("RESULTS")
+//                }
+//    }
+    
     private var mainView: some View {
         DataScannerView(
             recognizedItems: $vm.recognizedItems,
-            showAlert: $vm.showAlert,
+            showAlert: $isAlertVisible,
             recognizedDataType: vm.recognizedDataType,
             recognizesMultipleItems: vm.recognizesMultipleItems)
         .background { Color.gray.opacity(0.3) }
         .ignoresSafeArea()
         .id(vm.dataScannerViewId)
-        .sheet(isPresented: .constant(true)) {
-            bottomContainerView
-                .background(.ultraThinMaterial)
-                .presentationDetents([.medium, .fraction(0.25)])
-                .presentationDragIndicator(.visible)
-                .interactiveDismissDisabled()
-                .onAppear {
-                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                          let controller = windowScene.windows.first?.rootViewController?.presentedViewController else {
-                        return
-                    }
-                    controller.view.backgroundColor = .clear
+//        .sheet(isPresented: $isAlertVisible) {
+//            VStack {
+//                Text("Scan Results")
+//                Button(role: .destructive) {
+//                    // Handle the deletion.
+//                } label: {
+//                    Text("Delete")
+//                }
+//                Button("Retry") {
+//                    // Handle the retry action.
+//                }
+//            }
+//        }
+        .sheet(isPresented: $isAlertVisible) {
+            VStack {
+                Text("Scan Results")
+                Button(role: .destructive) {
+                    // Handle the deletion.
+                } label: {
+                    Text("Delete")
                 }
+                Button("Retry") {
+                    // Handle the retry action.
+                }
+            }
         }
         .onChange(of: vm.scanType) { _ in vm.recognizedItems = [] }
         .onChange(of: vm.textContentType) { _ in vm.recognizedItems = [] }
         .onChange(of: vm.recognizesMultipleItems) { _ in vm.recognizedItems = []}
-        .alert(isPresented: $vm.showAlert) {
-            Alert(title: Text("Scanned Text"), message: Text("The scanner has scanned some text."), dismissButton: .default(Text("OK")))
-        }
     }
     
     private var headerView: some View {
@@ -210,4 +302,8 @@ struct ContentView: View {
             }
         }
     }
+}
+
+#Preview {
+    ContentView()
 }
