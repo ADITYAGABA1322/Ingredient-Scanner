@@ -145,10 +145,32 @@
 import SwiftUI
 import VisionKit
 
+
+struct AllergySelectionView: View {
+    @Binding var selectedAllergy: String
+    @Binding var isPresented: Bool
+
+    let allergies = ["Peanut", "Egg", "Milk"]
+
+    var body: some View {
+        List(allergies, id: \.self) { allergy in
+            Button(action: {
+                selectedAllergy = allergy
+                isPresented = false
+            }) {
+                Text(allergy)
+            }
+        }
+    }
+}
+
 struct ContentView: View {
     
     @EnvironmentObject var vm: AppViewModel
+    @State var selectedAllergy = ""
     @State var isAlertVisible = false
+    @State var navigateToNewContentView = false
+    @State var isAllergySelectionViewPresented = true
 
     private let textContentTypes: [(title: String, textContentType: DataScannerViewController.TextContentType?)] = [
 //        ("All", .none),
@@ -217,18 +239,38 @@ struct ContentView: View {
 //                }
 //    }
     
-    private var mainView: some View {
-        DataScannerView(
-            recognizedItems: $vm.recognizedItems,
-            showAlert: $isAlertVisible,
-            recognizedDataType: vm.recognizedDataType,
-            recognizesMultipleItems: vm.recognizesMultipleItems)
-        .background { Color.gray.opacity(0.3) }
-        .ignoresSafeArea()
-        .id(vm.dataScannerViewId)
+//    private var mainView: some View {
+//        DataScannerView(
+//            recognizedItems: $vm.recognizedItems,
+//            showAlert: $isAlertVisible,
+//            recognizedDataType: vm.recognizedDataType,
+//            recognizesMultipleItems: vm.recognizesMultipleItems)
+//        .background { Color.gray.opacity(0.3) }
+//        .ignoresSafeArea()
+//        .id(vm.dataScannerViewId)
+////        .sheet(isPresented: $isAlertVisible) {
+////            VStack {
+////                Text("Scan Results")
+////                Button(role: .destructive) {
+////                    // Handle the deletion.
+////                } label: {
+////                    Text("Delete")
+////                }
+////                Button("Retry") {
+////                    // Handle the retry action.
+////                }
+////            }
+////        }
 //        .sheet(isPresented: $isAlertVisible) {
 //            VStack {
 //                Text("Scan Results")
+//                Image(systemName: "xmark.circle")
+//                    .resizable()
+//                    .frame(width: 50, height: 50)
+//                    .foregroundColor(.red)
+//                Text("This product contains harmful ingredients for your health.")
+//                    .foregroundColor(.red)
+//                    .padding()
 //                Button(role: .destructive) {
 //                    // Handle the deletion.
 //                } label: {
@@ -239,22 +281,94 @@ struct ContentView: View {
 //                }
 //            }
 //        }
-        .sheet(isPresented: $isAlertVisible) {
-            VStack {
-                Text("Scan Results")
-                Button(role: .destructive) {
-                    // Handle the deletion.
-                } label: {
-                    Text("Delete")
-                }
-                Button("Retry") {
-                    // Handle the retry action.
+//        .onChange(of: vm.scanType) { _ in vm.recognizedItems = [] }
+//        .onChange(of: vm.textContentType) { _ in vm.recognizedItems = [] }
+//        .onChange(of: vm.recognizesMultipleItems) { _ in vm.recognizedItems = []}
+//    }
+    
+    private var mainView: some View {
+//        NavigationView {
+//            DataScannerView(
+//                recognizedItems: $vm.recognizedItems,
+//                showAlert: $isAlertVisible,
+//                recognizedDataType: vm.recognizedDataType,
+//                recognizesMultipleItems: vm.recognizesMultipleItems)
+//            .background { Color.gray.opacity(0.3) }
+//            .ignoresSafeArea()
+//            .id(vm.dataScannerViewId)
+//            .sheet(isPresented: $isAlertVisible) {
+//                VStack {
+//                    Text("Scan Results")
+//                    Image(systemName: "xmark.circle")
+//                        .resizable()
+//                        .frame(width: 50, height: 50)
+//                        .foregroundColor(.red)
+//                    Text("This product contains harmful ingredients for your health.")
+//                        .foregroundColor(.red)
+//                        .padding()
+//                    Button(role: .destructive) {
+//                        // Handle the deletion.
+//                    } label: {
+//                        Text("Delete")
+//                    }
+//                    Button("Retry") {
+//                        // Handle the retry action.
+//                    }
+//                    NavigationLink(destination: ContentView(), isActive: $navigateToNewContentView) {
+//                        Button("Done") {
+//                            navigateToNewContentView = true
+//                        }
+//                    }
+//                }
+//            }
+//            .onChange(of: vm.scanType) { _ in vm.recognizedItems = [] }
+//            .onChange(of: vm.textContentType) { _ in vm.recognizedItems = [] }
+//            .onChange(of: vm.recognizesMultipleItems) { _ in vm.recognizedItems = []}
+//        }
+//    }
+    
+
+        NavigationView {
+            DataScannerView(
+                recognizedItems: $vm.recognizedItems,
+                showAlert: $isAlertVisible,
+                recognizedDataType: vm.recognizedDataType,
+                recognizesMultipleItems: vm.recognizesMultipleItems)
+            .background { Color.gray.opacity(0.3) }
+            .ignoresSafeArea()
+            .id(vm.dataScannerViewId)
+            .sheet(isPresented: $isAllergySelectionViewPresented) {
+                        AllergySelectionView(selectedAllergy: $selectedAllergy, isPresented: $isAllergySelectionViewPresented)
+                    }
+            .sheet(isPresented: $isAlertVisible) {
+                VStack {
+                    Text("Scan Results")
+                    Image(systemName: "xmark.circle")
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                        .foregroundColor(.red)
+                    Text("This product contains harmful ingredients for your health.")
+                        .foregroundColor(.red)
+                        .padding()
+                    Button(role: .destructive) {
+                        // Handle the deletion.
+                    } label: {
+                        Text("Delete")
+                    }
+                    Button("Retry") {
+                        // Handle the retry action.
+                    }
+                    NavigationLink(destination: ContentView(), isActive: $navigateToNewContentView) {
+                        Button("Done") {
+                            navigateToNewContentView = true
+                        }
+                    }
                 }
             }
+            .onChange(of: vm.scanType) { _ in vm.recognizedItems = [] }
+            .onChange(of: vm.textContentType) { _ in vm.recognizedItems = [] }
+            .onChange(of: vm.recognizesMultipleItems) { _ in vm.recognizedItems = []}
         }
-        .onChange(of: vm.scanType) { _ in vm.recognizedItems = [] }
-        .onChange(of: vm.textContentType) { _ in vm.recognizedItems = [] }
-        .onChange(of: vm.recognizesMultipleItems) { _ in vm.recognizedItems = []}
     }
     
     private var headerView: some View {
